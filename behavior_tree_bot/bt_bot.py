@@ -17,13 +17,16 @@ from behavior_tree_bot.checks import *
 from behavior_tree_bot.bt_nodes import Selector, Sequence, Action, Check
 
 from planet_wars import PlanetWars, finish_turn
-
 # You have to improve this tree or create an entire new one that is capable
 # of winning against all the 5 opponent bots
 def setup_behavior_tree():
-
     # Top-down construction of behavior tree
     root = Selector(name='High Level Ordering of Strategies')
+
+    priority_attack_strategy = Sequence(name='Priority Attack Strategy')
+    sufficient_defenses_check = Check(have_sufficient_defenses)
+    p_attack = Action(priority_attack)
+    priority_attack_strategy.child_nodes = [sufficient_defenses_check, p_attack]
 
     offensive_plan = Sequence(name='Offensive Strategy')
     largest_fleet_check = Check(have_largest_fleet)
@@ -35,7 +38,9 @@ def setup_behavior_tree():
     spread_action = Action(spread_to_weakest_neutral_planet)
     spread_sequence.child_nodes = [neutral_planet_check, spread_action]
 
-    root.child_nodes = [offensive_plan, spread_sequence, attack.copy()]
+    #root.child_nodes = [priority_attack_strategy, offensive_plan, spread_sequence, attack.copy()]
+    root.child_nodes = [priority_attack_strategy]
+
 
     logging.info('\n' + root.tree_to_string())
     return root
