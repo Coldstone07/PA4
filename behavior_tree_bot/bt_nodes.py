@@ -90,3 +90,25 @@ class Action(Node):
 
     def __str__(self):
         return self.__class__.__name__ + ': ' + self.action_function.__name__
+
+
+class Tautology_Sequence(Composite):
+    @log_execution
+    def execute(self, state):
+        for child_node in self.child_nodes:
+            continue_execution = child_node.execute(state)
+            if not continue_execution:
+                return True
+        else:  # for loop completed without failure; return success
+            return True
+
+
+class Tautology_Selector(Composite):
+    @log_execution
+    def execute(self, state):
+        for child_node in self.child_nodes:
+            success = child_node.execute(state)
+            if success:
+                return True
+        else:  # for loop completed without success; return failure
+            return True
